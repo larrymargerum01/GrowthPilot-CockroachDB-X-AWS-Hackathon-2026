@@ -1,6 +1,6 @@
 <div align="center">
 
-# GrowthPilot
+# 🤖 GrowthPilot
 
 ### Autonomous AI GTM Engineer with Persistent Memory
 
@@ -8,15 +8,22 @@
 
 Built for the CockroachDB AI Agent Hackathon 2026
 
+![Python](https://img.shields.io/badge/Python-FastAPI-blue)
+![AI](https://img.shields.io/badge/AI-Agent-green)
+![Database](https://img.shields.io/badge/Database-CockroachDB-red)
+![Vector Search](https://img.shields.io/badge/Vector%20Search-pgvector-purple)
+
 </div>
 
 ---
 
-# Overview
+# 📌 Overview
 
 GrowthPilot is an autonomous AI Go-to-Market (GTM) Engineer that helps founders launch products from idea to growth.
 
-Unlike traditional AI assistants that forget every conversation, GrowthPilot continuously builds long-term business memory.
+<!-- Unlike traditional AI assistants that forget every conversation, GrowthPilot continuously builds long-term business memory. -->
+
+Unlike traditional AI assistants that forget every conversation, GrowthPilot continuously builds long-term business memory powered by CockroachDB + pgvector.
 
 It researches markets, identifies customer segments, generates launch strategies, writes marketing content, tracks outreach, analyses performance, reflects on previous launches, and improves future decisions through persistent memory.
 
@@ -24,7 +31,7 @@ Instead of simply answering questions, GrowthPilot behaves like an AI growth tea
 
 ---
 
-# Why?
+<!-- # Why?
 
 Every startup founder repeats the same work:
 
@@ -39,19 +46,72 @@ Today's AI tools generate content but forget everything after each session.
 
 GrowthPilot changes that.
 
-Every decision, experiment, customer interaction and campaign becomes part of a continuously evolving company memory.
+Every decision, experiment, customer interaction and campaign becomes part of a continuously evolving company memory. -->
+
+# ⚠️ Problem
+
+Startup founders repeatedly spend time on:
+
+❌ Competitor research<br>
+❌ Customer discovery<br>
+❌ Writing launch content<br>
+❌ Tracking campaigns<br>
+❌ Remembering lessons learned
 
 ---
 
-# Demo Scenario
+# 💡 Solution
 
-Imagine launching a new product.
+GrowthPilot is an AI GTM teammate that:
 
-You tell GrowthPilot:
+✅ researches markets  
+✅ creates strategies  
+✅ generates content  
+✅ remembers company knowledge  
+✅ learns from previous campaigns
 
-> "I want to launch Mosaic Kitchen."
+---
 
-GrowthPilot automatically:
+# 💎 Key Differentiator
+
+Most AI assistants:
+
+Conversation → Response → Forget
+
+GrowthPilot:
+
+Conversation → Memory → Learning → Better Decisions
+
+Powered by CockroachDB + pgvector, every interaction becomes reusable company knowledge.
+
+---
+
+# 🎯 Hackathon MVP Scope
+
+GrowthPilot demonstrates an AI GTM workflow where a founder can:
+
+- Enter a product idea
+- Receive market research and customer insights
+- Generate a launch strategy and marketing content
+- Store company knowledge in CockroachDB
+- Ask future questions using previously learned memory
+
+This demonstrates how an AI teammate can continuously learn and improve alongside founders.
+
+---
+
+<!-- # Demo Scenario -->
+# 🎬 Demo Scenario: Launching Mosaic Kitchen
+
+<!-- You tell GrowthPilot:
+
+> "I want to launch Mosaic Kitchen." -->
+
+Founder:
+
+> "I want to launch Mosaic Kitchen, a sustainable kitchen product"
+
+<!-- GrowthPilot automatically:
 
 ✅ researches competitors
 
@@ -78,17 +138,80 @@ Next week, instead of starting from scratch, GrowthPilot remembers:
 - conversion rates
 - product evolution
 
-The AI grows alongside your company.
+The AI grows alongside your company. -->
+
+## Step 1: Market Research
+
+The Research Agent analyzes:
+
+- competitors
+- Reddit discussions
+- customer pain points
+- market trends
+
+Example insight:
+
+> "Customers want sustainable products but are concerned about high prices."
+
+## Step 2: GTM Strategy Generation
+
+GrowthPilot creates:
+
+- customer personas
+- positioning
+- launch channels
+- marketing strategy
+
+Example recommendation:
+
+> "Target young homeowners through Reddit communities and LinkedIn content."
+
+## Step 3: Content Creation
+
+The Content Agent generates:
+
+- LinkedIn posts
+- X threads
+- email campaigns
+- landing page copy
+
+## Step 4: Persistent Memory
+
+GrowthPilot stores:
+
+- research results
+- customer insights
+- campaign decisions
+- founder preferences
+
+in CockroachDB + pgvector.
+
+## Step 5: Continuous Learning
+
+One week later:
+
+Founder:
+
+> "What worked from our previous launch?"
+
+GrowthPilot retrieves previous memory:
+
+> "Reddit generated the highest engagement. Similar messaging should be tested again."
+
+GrowthPilot improves with every campaign.
 
 ---
 
-# Core Features
+# ⭐ Core Features
 
-## Persistent Company Memory
+<!-- ## Persistent AI Memory -->
+## 🧠 Persistent AI Company Memory (CockroachDB + pgvector)
 
-Every interaction is remembered.
+<!-- Every interaction is remembered. -->
+GrowthPilot's core capability is its long-term company memory.
 
-Examples include:
+<!-- Examples include: -->
+Unlike traditional AI assistants that forget previous conversations, GrowthPilot continuously stores and retrieves:
 
 - customer conversations
 - launch history
@@ -97,11 +220,12 @@ Examples include:
 - product decisions
 - founder preferences
 
-Memory survives across sessions.
+<!-- Memory survives across sessions. -->
+CockroachDB + pgvector enables semantic memory retrieval, allowing GrowthPilot to learn from previous actions and provide better recommendations over time.
 
 ---
 
-## AI Market Research
+##  🔎 AI Market Research
 
 Automatically researches:
 
@@ -116,7 +240,7 @@ Results become searchable company knowledge.
 
 ---
 
-## Customer Persona Builder
+## 👥 Customer Persona Builder
 
 Automatically generates:
 
@@ -129,7 +253,7 @@ Automatically generates:
 
 ---
 
-## Content Generation
+## ✍️ Content Generation
 
 Creates marketing assets including:
 
@@ -143,9 +267,10 @@ Creates marketing assets including:
 
 ---
 
-## Outreach Assistant
+<!-- ## Outreach Assistant -->
+## 🤝 Outreach Planning Assistant
 
-Tracks:
+Helps manage:
 
 - leads
 - conversations
@@ -157,7 +282,7 @@ GrowthPilot never forgets previous interactions.
 
 ---
 
-## Analytics Agent
+## 📊 Analytics Agent
 
 Collects and analyses:
 
@@ -171,7 +296,7 @@ Generates daily insights.
 
 ---
 
-## Reflection Engine
+## 🔄 Reflection Engine
 
 At the end of every day GrowthPilot performs self-reflection.
 
@@ -186,7 +311,11 @@ These reflections become long-term memory.
 
 ---
 
-# Multi-Agent Architecture
+# 🏗️ Multi-Agent Architecture
+
+GrowthPilot uses specialized AI agents coordinated by a Planner Agent.
+
+Each agent contributes knowledge that is stored in the shared memory layer.
 
 ```
                     User
@@ -213,7 +342,8 @@ Research   Strategy   ICP      Content    Outreach
 
 ---
 
-# Memory Architecture
+<!-- # Memory Architecture -->
+# 🗄️ Memory Architecture Powered by CockroachDB
 
 GrowthPilot stores multiple memory types.
 
@@ -275,7 +405,25 @@ Examples:
 
 ---
 
-# Tech Stack
+# 🏆 Hackathon Implementation
+
+The hackathon version focuses on proving the core AI memory-driven GTM workflow:
+
+- Multi-agent GTM workflow
+- Persistent memory with CockroachDB + pgvector
+- Market research agent
+- GTM strategy generation
+- Marketing content generation
+- Memory retrieval across conversations
+
+The system runs on AWS infrastructure, using CockroachDB Cloud as the persistent memory layer for storing and retrieving company knowledge.
+
+
+Additional capabilities such as CRM integration, advanced analytics, and autonomous launches are part of the future roadmap.
+
+---
+
+# 🛠️ Tech Stack
 
 ## Frontend
 
@@ -310,7 +458,7 @@ Examples:
 
 ---
 
-# MCP Workflow
+# ⚙️ MCP Workflow
 
 ```
 User Request
@@ -352,13 +500,13 @@ Memory Extraction
 CockroachDB Update
 ```
 
-GrowthPilot does not simply answer questions.
+GrowthPilot does not just answer questions — it builds institutional memory for startups.
 
 Every conversation updates long-term business memory.
 
 ---
 
-# Example Workflow
+<!-- # Example Workflow
 
 Founder:
 
@@ -384,9 +532,20 @@ GrowthPilot automatically:
 
 9. Improve future launches
 
----
+--- -->
 
-# Future Roadmap
+# 🎥 Demo Preview
+
+Coming soon:
+
+- Product launch workflow
+- Agent interactions
+- Memory retrieval demonstration
+- CockroachDB knowledge storage
+
+--- 
+
+# 🗺️ Future Roadmap
 
 ## Phase 1
 
@@ -408,7 +567,7 @@ GrowthPilot automatically:
 
 ---
 
-# Vision
+# 🌱 Vision
 
 GrowthPilot is not designed to replace marketers.
 
