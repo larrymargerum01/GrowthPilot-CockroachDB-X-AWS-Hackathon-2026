@@ -1,0 +1,59 @@
+# ---------- Secrets & credentials ----------
+# Never commit these. The CockroachDB connection string and AWS keys live here.
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+*.crt
+certs/
+.aws/
+credentials
+
+# ---------- Python / backend ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.eggs/
+.venv/
+venv/
+env/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ---------- Node / frontend ----------
+node_modules/
+dist/
+dist-ssr/
+build/
+.vite/
+*.local
+npm-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ---------- Infra ----------
+.terraform/
+*.tfstate
+*.tfstate.*
+cdk.out/
+.aws-sam/
+*.zip
+
+# ---------- Notebooks / scratch ----------
+.ipynb_checkpoints/
+scratch/
+tmp/
+
+# ---------- IDE / OS ----------
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
+*~
