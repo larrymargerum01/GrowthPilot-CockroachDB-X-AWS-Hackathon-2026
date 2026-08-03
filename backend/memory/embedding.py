@@ -24,4 +24,6 @@ class BedrockEmbeddingService:
             body = json.dumps(payload)
         )
 
-        return response
+        result = json.loads(response["body"].read())
+
+        return result["embedding"]
