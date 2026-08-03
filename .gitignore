@@ -57,3 +57,7 @@ Thumbs.db
 .vscode/
 *.swp
 *~
+
+# ---------- AI / Agent ----------
+CLAUDE.md
+notes/
