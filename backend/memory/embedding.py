@@ -4,8 +4,9 @@ class BedrockEmbeddingService:
     using AWS Bedrock.
     """
 
-    def __init__(self, client):
+    def __init__(self, client, model_id: str):
         self.client = client
+        self.model_id = model_id
 
     def generate_embedding(self, text: str):
         """
