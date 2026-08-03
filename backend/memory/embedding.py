@@ -1,3 +1,5 @@
+import json
+
 class BedrockEmbeddingService:
     """
     Service responsible for generating text embeddings
@@ -13,6 +15,13 @@ class BedrockEmbeddingService:
         Generate an embedding vector for the given text.
         """
 
-        response = self.client.invoke_model(body = text)
+        payload = {
+            "inputText": text
+        }
+
+        response = self.client.invoke_model(
+            modelId = self.model_id,
+            body = json.dumps(payload)
+        )
 
         return response
