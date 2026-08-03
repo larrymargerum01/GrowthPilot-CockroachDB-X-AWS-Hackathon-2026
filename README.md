@@ -11,7 +11,6 @@ Built for the CockroachDB AI Agent Hackathon 2026
 ![Python](https://img.shields.io/badge/Python-FastAPI-blue)
 ![AI](https://img.shields.io/badge/AI-Agent-green)
 ![Database](https://img.shields.io/badge/Database-CockroachDB-red)
-![Vector Search](https://img.shields.io/badge/Vector%20Search-pgvector-purple)
 
 </div>
 
@@ -23,7 +22,7 @@ GrowthPilot is an autonomous AI Go-to-Market (GTM) Engineer that helps founders 
 
 <!-- Unlike traditional AI assistants that forget every conversation, GrowthPilot continuously builds long-term business memory. -->
 
-Unlike traditional AI assistants that forget every conversation, GrowthPilot continuously builds long-term business memory powered by CockroachDB + pgvector.
+Unlike traditional AI assistants that forget every conversation, GrowthPilot continuously builds long-term business memory powered by CockroachDB.
 
 It researches markets, identifies customer segments, generates launch strategies, writes marketing content, tracks outreach, analyses performance, reflects on previous launches, and improves future decisions through persistent memory.
 
@@ -82,7 +81,7 @@ GrowthPilot:
 
 Conversation → Memory → Learning → Better Decisions
 
-Powered by CockroachDB + pgvector, every interaction becomes reusable company knowledge.
+Powered by CockroachDB, every interaction becomes reusable company knowledge.
 
 ---
 
@@ -184,7 +183,7 @@ GrowthPilot stores:
 - campaign decisions
 - founder preferences
 
-in CockroachDB + pgvector.
+in CockroachDB.
 
 ## Step 5: Continuous Learning
 
@@ -205,7 +204,7 @@ GrowthPilot improves with every campaign.
 # ⭐ Core Features
 
 <!-- ## Persistent AI Memory -->
-## 🧠 Persistent AI Company Memory (CockroachDB + pgvector)
+## 🧠 Persistent AI Company Memory (CockroachDB)
 
 <!-- Every interaction is remembered. -->
 GrowthPilot's core capability is its long-term company memory.
@@ -221,7 +220,7 @@ Unlike traditional AI assistants that forget previous conversations, GrowthPilot
 - founder preferences
 
 <!-- Memory survives across sessions. -->
-CockroachDB + pgvector enables semantic memory retrieval, allowing GrowthPilot to learn from previous actions and provide better recommendations over time.
+CockroachDB enables semantic memory retrieval, allowing GrowthPilot to learn from previous actions and provide better recommendations over time.
 
 ---
 
@@ -335,7 +334,7 @@ Research   Strategy   ICP      Content    Outreach
                 │
         Memory Retrieval Layer
                 │
-        CockroachDB + pgvector
+        CockroachDB
                 │
           Persistent Memory
 ```
@@ -410,7 +409,7 @@ Examples:
 The hackathon version focuses on proving the core AI memory-driven GTM workflow:
 
 - Multi-agent GTM workflow
-- Persistent memory with CockroachDB + pgvector
+- Persistent memory with CockroachDB
 - Market research agent
 - GTM strategy generation
 - Marketing content generation
@@ -447,7 +446,6 @@ Additional capabilities such as CRM integration, advanced analytics, and autonom
 ## Memory
 
 - CockroachDB Cloud
-- pgvector
 
 ## Infrastructure
 
