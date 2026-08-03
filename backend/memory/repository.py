@@ -6,3 +6,15 @@ class MemoryRepository:
 
     def __init__(self, connection):
         self.connection = connection
+
+    def save_memory(self, content: str, embedding: list):
+        """
+        Save a memory chunk and its embedding vector.
+        """
+
+        query = """
+        INSERT INTO memories (content, embedding)
+        VALUES (%s, %s)
+        """
+
+        self.connection.execute(query, (content, embedding))
