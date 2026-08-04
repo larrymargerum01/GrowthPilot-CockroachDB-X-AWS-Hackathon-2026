@@ -335,3 +335,75 @@ Relevant AI Memories
 ```
 
 CockroachDB is suitable as the persistent memory foundation for GrowthPilot.
+
+---
+
+# 9. Prefix Column + Tenant Isolation Spike (T5, Coral, 2026-08-04)
+
+The section above validates vector storage in general but never tests the
+`company_id` prefix column, which is the mechanism GrowthPilot actually
+depends on for tenant isolation and search-space reduction (see
+`memories` schema in the project interface contract). This section fills
+that gap, run against `gtm-agent` (CockroachDB CCL v26.2.1, AWS eu-west-2).
+
+## Setup
+
+```sql
+SET CLUSTER SETTING feature.vector_index.enabled = true;
+
+CREATE TABLE spike_prefix (
+    id          INT PRIMARY KEY,
+    company_id  INT NOT NULL,
+    embedding   VECTOR(3),
+    VECTOR INDEX (company_id, embedding vector_cosine_ops)
+);
+```
+
+Table created on the first attempt — prefix column and opclass are
+combinable in a single inline `VECTOR INDEX` clause, no workaround needed.
+
+```sql
+SHOW CREATE TABLE spike_prefix;
+```
+
+```
+VECTOR INDEX spike_prefix_company_id_embedding_idx (company_id, embedding vector_cosine_ops)
+```
+
+Index name is auto-generated (`<table>_<cols>_idx`). Table also carries
+`schema_locked = true` by default in this CockroachDB version — unrelated to
+vector indexing, just noting it in case it affects future `ALTER TABLE`.
+
+## Data
+
+```sql
+INSERT INTO spike_prefix (id, company_id, embedding) VALUES
+    (1, 100, '[1,0,0]'),
+    (2, 100, '[0.9,0.1,0]'),
+    (3, 100, '[0,1,0]'),
+    (4, 200, '[1,0,0]');
+```
+
+## Findings
+
+| Question | Result |
+|---|---|
+| CockroachDB version | CCL v26.2.1 |
+| Chosen dimension | 1024 (Titan v2), tested here at 3 for hand-typed vectors |
+| Chosen metric | cosine (`<=>` / `vector_cosine_ops`) |
+| Prefix column + opclass combinable | **Yes**, in one inline `VECTOR INDEX` clause |
+| Cross-tenant leakage | **None** — `WHERE company_id = 100` never returned company 200's row |
+| Index used with `=` | **Yes** — plan shows `vector search` on `spike_prefix_company_id_embedding_idx`, `prefix spans: [/100 - /100]` |
+| Index used with `>=` (range) | **No** — falls back to `FULL SCAN` on `spike_prefix_pkey`. CockroachDB even suggested an unrelated B-tree index. Confirms finding #3 in project notes: range predicates on the prefix column defeat the vector index. |
+| Index used with `IN (...)` | **Yes** — plan shows `vector search` with `prefix spans: [/100 - /100] [/200 - /200]`, i.e. CockroachDB splits the `IN` list into independent exact spans and scans the index for each. |
+
+## Implication for GrowthGraph (T36)
+
+The cross-founder query must filter the prefix column with `IN (...)`
+(or repeated `=`), never a range predicate, or it silently falls back to a
+full table scan across every company's embeddings — both a performance
+problem and a soft tenant-isolation smell (the row is still filtered
+correctly by the `filter:` step, just not by the index).
+
+Cleanup: `DROP TABLE spike_prefix;` run after this section, confirmed table
+gone.
