@@ -407,3 +407,45 @@ correctly by the `filter:` step, just not by the index).
 
 Cleanup: `DROP TABLE spike_prefix;` run after this section, confirmed table
 gone.
+
+## Mapping to the production schema
+
+`spike_prefix` used `INT` ids and `VECTOR(3)` so vectors could be typed by
+hand. The real `memories` table (frozen in the interface contract) swaps
+those for `UUID` and `VECTOR(1024)`, but the index clause is identical in
+shape:
+
+```sql
+-- spike (this doc)
+CREATE TABLE spike_prefix (
+    id          INT PRIMARY KEY,
+    company_id  INT NOT NULL,
+    embedding   VECTOR(3),
+    VECTOR INDEX (company_id, embedding vector_cosine_ops)
+);
+
+-- production (backend/memory, T7)
+CREATE TABLE memories (
+    id           UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    company_id   UUID NOT NULL REFERENCES companies(id),
+    memory_type  STRING NOT NULL,
+    content      STRING NOT NULL,
+    content_hash STRING NOT NULL,
+    metadata     JSONB NOT NULL DEFAULT '{}',
+    embedding    VECTOR(1024),
+    importance   FLOAT NOT NULL DEFAULT 0.5,
+    created_at   TIMESTAMPTZ NOT NULL DEFAULT now(),
+    last_accessed_at TIMESTAMPTZ,
+    access_count INT NOT NULL DEFAULT 0,
+    VECTOR INDEX (company_id, embedding vector_cosine_ops),
+    INDEX idx_company_type_time (company_id, memory_type, created_at DESC),
+    UNIQUE INDEX idx_dedup (company_id, content_hash)
+);
+```
+
+Everything this doc validated transfers directly: `company_id` as the
+prefix column, `vector_cosine_ops` as the opclass, `=`/`IN` as the only
+predicate shapes that keep the vector index in the plan. The extra columns
+(`memory_type`, `content_hash`, `importance`, access tracking) don't change
+index behavior — they're outside the `VECTOR INDEX` clause, so this spike's
+conclusions hold unchanged for T7.
