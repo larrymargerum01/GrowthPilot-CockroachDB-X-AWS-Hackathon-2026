@@ -1,11 +1,17 @@
+import psycopg2
+
+from backend.memory.config import DatabaseConfig
+
 class CockroachDBConnection:
     """
     Handles connection and query execution
     for CockroachDB.
     """
 
-    def __init__(self, connection):
-        self.connection = connection
+    def __init__(self):
+        config = DatabaseConfig()
+        
+        self.connection = psycopg2.connect(config.database_url)
 
     def execute(self, query, values = None):
         """
