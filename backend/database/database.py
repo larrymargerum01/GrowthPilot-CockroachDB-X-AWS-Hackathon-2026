@@ -1,6 +1,6 @@
 import psycopg2
 
-from backend.memory.config import DatabaseConfig
+from backend.database.config import DatabaseConfig
 
 class CockroachDBConnection:
     """
