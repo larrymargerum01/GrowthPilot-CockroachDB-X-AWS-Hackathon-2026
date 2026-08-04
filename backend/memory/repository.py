@@ -1,11 +1,13 @@
+from backend.database.connection import CockroachDBConnection
+
 class MemoryRepository:
     """
     Repository responsible for storing memory chunks
     and their embeddings in CockroachDB.
     """
 
-    def __init__(self, connection):
-        self.connection = connection
+    def __init__(self):
+        self.connection = CockroachDBConnection()
 
     def save_memory(self, content: str, embedding: list):
         """
