@@ -6,8 +6,8 @@ class MemoryRepository:
     and their embeddings in CockroachDB.
     """
 
-    def __init__(self):
-        self.connection = CockroachDBConnection()
+    def __init__(self, connection):
+        self.connection = connection
 
     def save_memory(self, content: str, embedding: list):
         """
