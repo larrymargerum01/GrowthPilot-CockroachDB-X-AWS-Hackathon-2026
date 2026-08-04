@@ -19,4 +19,6 @@ class MemoryRepository:
         VALUES (%s, %s)
         """
 
-        self.connection.execute(query, (content, embedding))
+        result = self.connection.execute(query, (content, embedding))
+
+        return result

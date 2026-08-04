@@ -19,6 +19,8 @@ class MockDatabaseConnection:
         self.executed_query = query
         self.executed_values = values
 
+        return ("memory-id-123")
+
 def test_save_memory():
     """
     Verify that memory content and embeddings
@@ -33,7 +35,9 @@ def test_save_memory():
 
     embedding = [0.123, 0.456, 0.789]
 
-    repository.save_memory(content, embedding)
+    result = repository.save_memory(content, embedding)
+
+    assert result == ("memory-id-123")
 
     assert "INSERT INTO memories" in (
         connection.executed_query
