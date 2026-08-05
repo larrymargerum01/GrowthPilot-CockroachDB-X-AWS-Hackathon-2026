@@ -48,7 +48,7 @@ class Database:
             self.pool = None
 
 
-    async def acquire(self):
+    def acquire(self):
         """
         Acquire one connection from pool.
         """
