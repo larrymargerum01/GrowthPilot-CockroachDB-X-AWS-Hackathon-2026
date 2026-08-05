@@ -1,5 +1,17 @@
 from abc import ABC, abstractmethod
+from typing import Any, Dict
+from pydantic import BaseModel, Field
 from backend.agents.context import AgentContext
+
+
+class AgentResult(BaseModel):
+    """
+    Standard schema for agent execution results.
+    """
+    agent_name: str
+    success: bool
+    output: Any
+    metadata: Dict[str, Any] = Field(default_factory=dict)
 
 
 class Agent(ABC):
@@ -22,7 +34,7 @@ class Agent(ABC):
         pass
 
     @abstractmethod
-    async def run(self, *args, **kwargs):
+    async def run(self, *args, **kwargs) -> AgentResult:
         """
         Execute the main business logic of the agent.
         """

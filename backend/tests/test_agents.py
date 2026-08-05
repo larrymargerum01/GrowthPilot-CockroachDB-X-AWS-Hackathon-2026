@@ -1,7 +1,7 @@
 from uuid import uuid4
 from unittest.mock import MagicMock
 import pytest
-from backend.agents import Agent, AgentContext
+from backend.agents import Agent, AgentContext, AgentResult
 
 
 class ConcreteAgent(Agent):
@@ -9,8 +9,12 @@ class ConcreteAgent(Agent):
     def name(self) -> str:
         return "test-agent"
 
-    async def run(self, *args, **kwargs) -> str:
-        return "run-success"
+    async def run(self, *args, **kwargs) -> AgentResult:
+        return AgentResult(
+            agent_name=self.name,
+            success=True,
+            output="run-success"
+        )
 
 
 def test_agent_context_creation():
@@ -52,4 +56,7 @@ async def test_concrete_agent_execution():
     assert agent.context == context
 
     result = await agent.run()
-    assert result == "run-success"
+    assert isinstance(result, AgentResult)
+    assert result.agent_name == "test-agent"
+    assert result.success is True
+    assert result.output == "run-success"
