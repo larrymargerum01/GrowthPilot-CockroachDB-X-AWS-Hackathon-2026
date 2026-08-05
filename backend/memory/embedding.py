@@ -1,4 +1,6 @@
+import asyncio
 import json
+
 
 class BedrockEmbeddingService:
     """
@@ -10,20 +12,24 @@ class BedrockEmbeddingService:
         self.client = client
         self.model_id = model_id
 
-    def generate_embedding(self, text: str):
+
+    async def generate_embedding(self, text: str):
         """
-        Generate an embedding vector for the given text.
+        Generate an embedding vector for the given text asynchronously.
         """
 
         payload = {
             "inputText": text
         }
 
-        response = self.client.invoke_model(
-            modelId = self.model_id,
-            body = json.dumps(payload)
+        response = await asyncio.to_thread(
+            self.client.invoke_model,
+            modelId=self.model_id,
+            body=json.dumps(payload),
         )
 
-        result = json.loads(response["body"].read())
+        result = json.loads(
+            response["body"].read()
+        )
 
         return result["embedding"]
