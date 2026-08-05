@@ -12,7 +12,7 @@ class TextChunker:
     """
 
 
-    def chunk_text(self, content: str, chunk_size: int = 500):
+    def chunk_text(self, content: str, chunk_size: int = 500) -> list[str]:
         """
         Split text content into smaller chunks.
 
@@ -26,6 +26,11 @@ class TextChunker:
         Returns:
             List of text chunks.
         """
+
+        if chunk_size <= 0:
+            raise ValueError(
+                "chunk_size must be greater than zero"
+            )
 
         words = content.split()
 

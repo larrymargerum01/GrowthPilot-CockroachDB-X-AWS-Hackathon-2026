@@ -1,30 +1,49 @@
-from backend.memory.chunker import chunk_text
+from backend.memory.chunker import TextChunker
 
-def test_chunk_text():
+
+def test_chunk_text_splits_large_text():
     """
-    Verify that short content remains as a single chunk.
-    """
-
-    content = "This is a simple memory test"
-
-    chunks = chunk_text(content)
-
-    assert len(chunks) == 1
-    assert chunks[0] == content
-
-
-def test_chunk_text_multiple_chunks():
-    """
-        Verify that large content is split into
-        correctly sized chunks.
+    Verify that text is split into multiple chunks
+    based on chunk size.
     """
 
-    # Simulate a long document that needs multiple embeddings. 
-    content = "word " * 1200
+    chunker = TextChunker()
 
-    chunks = chunk_text(content, chunk_size=500)
+    text = " ".join(
+        [f"word{i}" for i in range(1200)]
+    )
+
+    chunks = chunker.chunk_text(text, chunk_size=500)
 
     assert len(chunks) == 3
+
     assert len(chunks[0].split()) == 500
     assert len(chunks[1].split()) == 500
     assert len(chunks[2].split()) == 200
+
+
+def test_chunk_text_returns_single_chunk_for_small_text():
+    """
+    Verify that small text does not get unnecessarily split.
+    """
+
+    chunker = TextChunker()
+
+    text = "This is a small document."
+
+    chunks = chunker.chunk_text(text, chunk_size=500)
+
+    assert len(chunks) == 1
+    assert chunks[0] == text
+
+
+def test_chunk_text_handles_empty_input():
+    """
+    Verify empty content returns no chunks.
+    """
+
+    chunker = TextChunker()
+
+    chunks = chunker.chunk_text("")
+
+    assert chunks == []

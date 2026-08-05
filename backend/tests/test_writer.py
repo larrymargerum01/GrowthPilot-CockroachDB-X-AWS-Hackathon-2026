@@ -1,37 +1,84 @@
+import pytest
+
 from backend.memory.writer import MemoryWriter
 
+
 class MockChunker:
-    def chunk_text(self, text):
+    """
+    Mock text chunking service.
+    """
+
+    def chunk_text(
+        self,
+        text,
+    ):
         return [
-            "chunk one",
-            "chunk two"
+            text
         ]
 
-class MockEmbedding:
-    def generate_embedding(self, text):
-        return [0.1, 0.2]
+
+class MockEmbeddingService:
+    """
+    Mock embedding generator.
+    """
+
+    async def generate_embedding(
+        self,
+        text,
+    ):
+        return [
+            0.1,
+            0.2,
+            0.3,
+        ]
+
 
 class MockRepository:
-    def __init__(self):
-        self.saved = []
+    """
+    Mock memory repository.
 
-    def save_memory(self, content, embedding):
-        self.saved.append((content, embedding))
+    Simulates saving memory into CockroachDB.
+    """
 
-        return "memory-id"
+    async def save_memory(
+        self,
+        company_id,
+        memory_type,
+        content,
+        metadata,
+        importance,
+        embedding,
+    ):
+        return "test-memory-id"
 
-def test_memory_writer_pipeline():
-    repository = MockRepository()
+
+@pytest.mark.asyncio
+async def test_memory_writer_pipeline():
+    """
+    Verify the complete memory creation pipeline:
+
+    text
+      ↓
+    chunks
+      ↓
+    embeddings
+      ↓
+    repository
+      ↓
+    memory id
+    """
 
     writer = MemoryWriter(
-        MockChunker(),
-        MockEmbedding(),
-        repository
+        chunker=MockChunker(),
+        embedding_service=MockEmbeddingService(),
+        repository=MockRepository(),
     )
 
-    result = writer.write(
-        "hello world"
+    result = await writer.write(
+        company_id="test-company-id",
+        text="hello world",
     )
 
-    assert len(result) == 2
-    assert len(repository.saved) == 2
+    assert result == [
+        "test-memory-id"
+    ]
