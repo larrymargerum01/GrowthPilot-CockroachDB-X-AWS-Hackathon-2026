@@ -1,35 +1,23 @@
-import asyncio
-import json
-
-
 class BedrockEmbeddingService:
     """
-    Service responsible for generating text embeddings
-    using AWS Bedrock.
+    Memory-layer embedding service.
+
+    This keeps memory logic independent from AWS.
+    It delegates Bedrock communication to BedrockClient.
     """
 
-    def __init__(self, client, model_id: str):
-        self.client = client
-        self.model_id = model_id
+    def __init__(self, bedrock_client):
+        self.bedrock_client = bedrock_client
 
-
-    async def generate_embedding(self, text: str):
+    async def generate_embedding(
+        self,
+        text: str,
+    ) -> list[float]:
         """
-        Generate an embedding vector for the given text asynchronously.
+        Generate embedding for memory storage.
         """
 
-        payload = {
-            "inputText": text
-        }
-
-        response = await asyncio.to_thread(
-            self.client.invoke_model,
-            modelId=self.model_id,
-            body=json.dumps(payload),
+        return await (
+            self.bedrock_client
+            .get_embedding(text)
         )
-
-        result = json.loads(
-            response["body"].read()
-        )
-
-        return result["embedding"]

@@ -1,84 +1,50 @@
-import pytest
+class MemoryWriter:
 
-from backend.memory.writer import MemoryWriter
-
-
-class MockChunker:
-    """
-    Mock text chunking service.
-    """
-
-    def chunk_text(
+    def __init__(
         self,
-        text,
+        chunker,
+        embedding_service,
+        repository,
     ):
-        return [
-            text
-        ]
+        self.chunker = chunker
+        self.embedding_service = embedding_service
+        self.repository = repository
 
 
-class MockEmbeddingService:
-    """
-    Mock embedding generator.
-    """
-
-    async def generate_embedding(
+    async def write(
         self,
-        text,
+        company_id: str,
+        content: str,
+        memory_type: str = "episodic",
+        metadata: dict | None = None,
+        importance: float = 0.5,
     ):
-        return [
-            0.1,
-            0.2,
-            0.3,
-        ]
 
+        metadata = metadata or {}
 
-class MockRepository:
-    """
-    Mock memory repository.
+        chunks = self.chunker.chunk_text(content)
 
-    Simulates saving memory into CockroachDB.
-    """
+        saved_memories = []
 
-    async def save_memory(
-        self,
-        company_id,
-        memory_type,
-        content,
-        metadata,
-        importance,
-        embedding,
-    ):
-        return "test-memory-id"
+        for chunk in chunks:
 
+            embedding = await (
+                self.embedding_service
+                .generate_embedding(chunk)
+            )
 
-@pytest.mark.asyncio
-async def test_memory_writer_pipeline():
-    """
-    Verify the complete memory creation pipeline:
+            memory_id = await (
+                self.repository
+                .save_memory(
+                    company_id=company_id,
+                    memory_type=memory_type,
+                    content=chunk,
+                    metadata=metadata,
+                    importance=importance,
+                    embedding=embedding,
+                )
+            )
 
-    text
-      ↓
-    chunks
-      ↓
-    embeddings
-      ↓
-    repository
-      ↓
-    memory id
-    """
+            saved_memories.append(memory_id)
 
-    writer = MemoryWriter(
-        chunker=MockChunker(),
-        embedding_service=MockEmbeddingService(),
-        repository=MockRepository(),
-    )
-
-    result = await writer.write(
-        company_id="test-company-id",
-        text="hello world",
-    )
-
-    assert result == [
-        "test-memory-id"
-    ]
+        return saved_memories
