@@ -61,7 +61,8 @@ async def run_migrations():
 
                     # Execute schema statements
                     if sql.strip():
-                        await conn.execute(sql)
+                        async with conn.transaction():
+                            await conn.execute(sql)
                 except Exception as e:
                     raise RuntimeError(f"Migration failed: {migration_file.name}") from e
 
