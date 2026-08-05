@@ -5,7 +5,7 @@ from backend.database.database import database
 
 @pytest.mark.integration
 @pytest.mark.asyncio
-async def test_database_connection():
+async def test_database_pool_connection():
     """
     Verify that the application can connect
     to CockroachDB through asyncpg pool.
