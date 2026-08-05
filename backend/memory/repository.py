@@ -9,7 +9,15 @@ class MemoryRepository:
     def __init__(self, connection):
         self.connection = connection
 
-    def save_memory(self, content: str, embedding: list):
+    def save_memory(
+            self,
+            company_id,
+            memory_type,
+            content: str,
+            metadata,
+            importance,
+            embedding: list
+        ):
         """
         Save a memory chunk and its embedding vector.
         """
