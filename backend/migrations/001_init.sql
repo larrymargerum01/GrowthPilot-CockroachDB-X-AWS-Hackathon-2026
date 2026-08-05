@@ -48,7 +48,7 @@ CREATE TABLE IF NOT EXISTS memories(
 -- on what the Planner / Content / Analytics agents actually read and write.
 CREATE TABLE IF NOT EXISTS campaigns(
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-        company_id  UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    company_id  UUID NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
     name        STRING NOT NULL,
     channel     STRING,
     status      STRING NOT NULL DEFAULT 'draft',
