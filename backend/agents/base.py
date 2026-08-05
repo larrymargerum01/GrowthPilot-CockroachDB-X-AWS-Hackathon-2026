@@ -33,9 +33,44 @@ class Agent(ABC):
         """
         pass
 
-    @abstractmethod
     async def run(self, *args, **kwargs) -> AgentResult:
         """
-        Execute the main business logic of the agent.
+        Orchestrate the standard agent lifecycle:
+        1. Retrieve memories/context
+        2. Execute reasoning/actions (process)
+        3. Persist new memories or reflections
+        """
+        try:
+            memories = await self.retrieve_memories(*args, **kwargs)
+            output = await self.process(memories, *args, **kwargs)
+            await self.persist_memories(output)
+            return AgentResult(
+                agent_name=self.name,
+                success=True,
+                output=output
+            )
+        except Exception as e:
+            return AgentResult(
+                agent_name=self.name,
+                success=False,
+                output=str(e)
+            )
+
+    async def retrieve_memories(self, *args, **kwargs) -> Any:
+        """
+        Hook to retrieve relevant memories/context prior to execution.
+        """
+        return None
+
+    @abstractmethod
+    async def process(self, retrieved_memories: Any, *args, **kwargs) -> Any:
+        """
+        Execute core reasoning and actions. Must be implemented by sub-classes.
+        """
+        pass
+
+    async def persist_memories(self, result_data: Any) -> None:
+        """
+        Hook to persist new memories or reflections back to storage.
         """
         pass
