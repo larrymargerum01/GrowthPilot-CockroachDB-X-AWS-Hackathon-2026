@@ -1,26 +1,31 @@
-import os
 import pytest
-from pathlib import Path
 
-from backend.database.connection import CockroachDBConnection
+from backend.database.database import database
 
 
 @pytest.mark.integration
-def test_apply_schema():
+@pytest.mark.asyncio
+async def test_database_connection():
+    """
+    Verify that the application can connect
+    to CockroachDB through asyncpg pool.
+    """
 
-    if not os.getenv("DATABASE_URL"):
-        pytest.skip("DATABASE_URL is not configured")
+    await database.connect()
 
-    db = CockroachDBConnection()
+    assert database.pool is not None
 
-    schema_path = (
-        Path(__file__)
-        .parent
-        .parent
-        / "database"
-        / "schema.sql"
-    )
 
-    assert db.connection is not None
+    async with database.pool.acquire() as connection:
 
-    db.connection.close()
+        result = await connection.fetchval(
+            "SELECT 1"
+        )
+
+
+    assert result == 1
+
+
+    await database.disconnect()
+
+    assert database.pool is None

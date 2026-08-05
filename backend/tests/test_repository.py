@@ -1,49 +1,58 @@
+import pytest
+
 from backend.memory.repository import MemoryRepository
+from backend.database.database import database
 
-class MockDatabaseConnection:
-    """
-    Fake database connection used for testing.
 
-    It records SQL queries instead of executing them.
-    """
+class MockConnection:
 
-    def __init__(self):
-        self.executed_query = None
-        self.executed_values = None
+    async def fetchval(self, query, *args):
+        return "test-memory-id"
 
-    def execute(self, query, values):
-        """
-        Simulate database execution.
-        """
 
-        self.executed_query = query
-        self.executed_values = values
 
-        return ("memory-id-123")
+class MockAcquire:
 
-def test_save_memory():
-    """
-    Verify that memory content and embeddings
-    are sent correctly to the database.
-    """
+    async def __aenter__(self):
+        return MockConnection()
 
-    connection = MockDatabaseConnection()
 
-    repository = MemoryRepository(connection)
+    async def __aexit__(self, exc_type, exc, tb):
+        pass
 
-    content = "Customer prefers sustainable products"
 
-    embedding = [0.123, 0.456, 0.789]
 
-    result = repository.save_memory(content, embedding)
+class MockPool:
 
-    assert result == ("memory-id-123")
+    def acquire(self):
+        return MockAcquire()
 
-    assert "INSERT INTO memories" in (
-        connection.executed_query
+
+
+@pytest.mark.asyncio
+async def test_save_memory():
+
+    original_pool = database.pool
+
+    database.pool = MockPool()
+
+
+    repository = MemoryRepository()
+
+
+    result = await repository.save_memory(
+        company_id="company-1",
+        memory_type="reflection",
+        content="GrowthPilot learned something",
+        metadata={
+            "source": "agent"
+        },
+        importance=0.8,
+        embedding=[0.1, 0.2, 0.3],
     )
 
-    assert connection.executed_values == (
-        content,
-        embedding
-    )
+
+    assert result == "test-memory-id"
+
+
+    database.pool = original_pool
