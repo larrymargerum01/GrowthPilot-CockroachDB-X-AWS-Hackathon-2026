@@ -2,6 +2,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from backend.database.database import database
 from backend.api.health import router as health_router
+from backend.api.auth import router as auth_router
 
 
 @asynccontextmanager
@@ -15,5 +16,6 @@ async def lifespan(app: FastAPI):
 # Initialize the core FastAPI application with the lifespan manager
 app = FastAPI(title="GTM Agent API", lifespan=lifespan)
 
-# Include the health router
+# Include routers
 app.include_router(health_router)
+app.include_router(auth_router)
