@@ -449,3 +449,37 @@ predicate shapes that keep the vector index in the plan. The extra columns
 (`memory_type`, `content_hash`, `importance`, access tracking) don't change
 index behavior — they're outside the `VECTOR INDEX` clause, so this spike's
 conclusions hold unchanged for T7.
+
+## Connection layer (T6b)
+
+### Pool sizing
+
+| Setting | Value | Why |
+|---|---|---|
+| `min_size` | 2 | Keeps warm connections so the first request doesn't pay for a TCP + TLS handshake. |
+| `max_size` | 10 | CockroachDB Serverless caps concurrent connections, and every agent shares this pool. |
+| `command_timeout` | 10s | Fails a query rather than hanging indefinitely when the cluster is unreachable — a clean error is far easier to debug than a request that never returns. |
+| `max_inactive_connection_lifetime` | 300s | CockroachDB Cloud closes idle connections server-side. Recycling first avoids the pool handing out dead sockets. |
+
+All four are configurable via environment variables (`DB_POOL_MIN_SIZE` etc.) through `Settings`, so they can be tuned per environment without a code change.
+
+### Retry policy
+
+CockroachDB defaults to `SERIALIZABLE` isolation. Where Postgres blocks on
+conflict, CockroachDB aborts one of the conflicting transactions with
+SQLSTATE `40001`. That is normal operation, not an error condition.
+
+Once a transaction receives `40001` it is already aborted server-side, so
+retrying a single statement inside it fails again. `run_in_txn` therefore
+retries the **entire transaction** as a re-runnable function, re-acquiring
+a connection on each attempt, with exponential backoff and full jitter.
+
+Without jitter, two conflicting transactions back off by the same amount
+and collide again on retry. Non-retryable errors (e.g. a unique violation,
+which indicates a bug rather than a conflict) fail on the first attempt.
+
+Embeddings are computed **outside** the transaction — retrying a
+transaction that calls Bedrock costs money and latency.
+
+The retry policy is decoupled from connection handling and covered by unit
+tests that run without a live database (`backend/tests/test_retry.py`).
