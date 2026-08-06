@@ -1,3 +1,4 @@
+from backend.memory.hash import create_content_hash
 class MemoryWriter:
     """
     Coordinates the memory creation pipeline.
@@ -27,6 +28,7 @@ class MemoryWriter:
 
     async def write(
         self,
+        company_id,
         text: str,
     ):
         """
@@ -39,6 +41,22 @@ class MemoryWriter:
 
         for chunk in chunks:
 
+            content_hash = create_content_hash(chunk)
+
+            # Check if this memory already exists before generating embeddings.
+            # This avoids duplicate records and unnecessary Bedrock embedding calls.
+            existing_memory = await (
+                self.repository.get_by_content_hash(
+                    company_id,
+                    content_hash
+                )
+            )
+
+            if existing_memory:
+                # Reuse existing memory instead of creating a duplicate.
+                saved_memories.append(existing_memory)
+                continue
+
             embedding = await (
                 self.embedding_service
                 .generate_embedding(chunk)
@@ -47,8 +65,13 @@ class MemoryWriter:
             memory_id = await (
                 self.repository
                 .save_memory(
-                    content=chunk,
-                    embedding=embedding,
+                    company_id = company_id,
+                    memory_type = 'semantic',
+                    content = chunk,
+                    content_hash = content_hash,
+                    metadata = {},
+                    importance = 0.5,
+                    embedding = embedding
                 )
             )
 

@@ -16,6 +16,7 @@ class MemoryRepository:
         company_id,
         memory_type,
         content,
+        content_hash,
         metadata,
         importance,
         embedding
@@ -33,6 +34,7 @@ class MemoryRepository:
             company_id,
             memory_type,
             content,
+            content_hash,
             metadata,
             importance,
             embedding
@@ -48,6 +50,7 @@ class MemoryRepository:
                 company_id,
                 memory_type,
                 content,
+                content_hash,
                 metadata,
                 importance,
                 embedding
@@ -79,3 +82,24 @@ class MemoryRepository:
             row = await connection.fetchrow(query, memory_id)
 
         return row
+
+    async def get_by_content_hash(
+        self,
+        company_id,
+        content_hash
+    ):
+        """
+        Find existing memory by company and content hash.
+        """
+
+        query = """
+        SELECT id
+        FROM memories
+        WHERE company_id = $1
+        AND content_hash = $2;
+        """
+
+        async with database.pool.acquire() as connection:
+            memory_id = connection.fetchval(query, company_id, content_hash)
+
+        return memory_id

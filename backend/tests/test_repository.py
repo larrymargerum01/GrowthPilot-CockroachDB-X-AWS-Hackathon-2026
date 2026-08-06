@@ -7,7 +7,7 @@ from backend.database.database import database
 class MockConnection:
 
     async def fetchval(self, query, *args):
-        return "test-memory-id"
+        return 1
 
 
 
@@ -44,6 +44,7 @@ async def test_save_memory():
         company_id="company-1",
         memory_type="reflection",
         content="GrowthPilot learned something",
+        content_hash = "test-hash-123",
         metadata={
             "source": "agent"
         },
@@ -52,7 +53,7 @@ async def test_save_memory():
     )
 
 
-    assert result == "test-memory-id"
+    assert result == 1
 
 
     database.pool = original_pool
