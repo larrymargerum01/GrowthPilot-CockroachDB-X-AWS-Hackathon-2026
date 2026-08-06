@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException
-from database.database import database
+from backend.database.database import database
 
 router = APIRouter()
 
@@ -19,5 +19,5 @@ async def health_check():
             
         return {"status": "ok", "db_connection": "healthy"}
     except Exception as e:
-        # Return a 503 Service Unavailable if the DB is down
-        raise HTTPException(status_code=503, detail=f"Database connection failed: {str(e)}")
+        # Return 200 so load balancers don't kill the instance, but mark as degraded
+        return {"status": "degraded", "db_connection": "unreachable", "details": str(e)}
