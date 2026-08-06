@@ -16,7 +16,7 @@ from typing import Awaitable, Callable, TypeVar
 
 import asyncpg
 
-from database.config import get_settings
+from backend.database.config import get_settings
 
 
 T = TypeVar("T")
