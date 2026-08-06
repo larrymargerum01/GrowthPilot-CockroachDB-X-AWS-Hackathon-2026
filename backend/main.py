@@ -1,7 +1,8 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
-from database.database import database
-from api.health import router as health_router
+from backend.database.database import database
+from backend.api.health import router as health_router
+
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
