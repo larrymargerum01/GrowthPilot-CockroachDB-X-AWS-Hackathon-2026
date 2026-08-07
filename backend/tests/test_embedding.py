@@ -1,12 +1,7 @@
 import pytest
 
 from backend.memory.embedding import BedrockEmbeddingService
-
-
-class MockBedrockClient:
-
-    async def get_embedding(self, text):
-        return [0.1] * 1024
+from backend.tests.mocks.bedrock import MockBedrockClient
 
 
 @pytest.mark.asyncio

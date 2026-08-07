@@ -1,50 +1,58 @@
-class MemoryWriter:
+from uuid import uuid4
 
-    def __init__(
-        self,
-        chunker,
-        embedding_service,
-        repository,
-    ):
-        self.chunker = chunker
-        self.embedding_service = embedding_service
-        self.repository = repository
+from backend.memory.chunker import TextChunker
+from backend.memory.embedding import BedrockEmbeddingService
+from backend.tests.mocks.repository import MockMemoryRepository
+from backend.memory.writer import MemoryWriter
+from backend.tests.mocks.bedrock import MockBedrockClient
 
 
-    async def write(
-        self,
-        company_id: str,
-        content: str,
-        memory_type: str = "episodic",
-        metadata: dict | None = None,
-        importance: float = 0.5,
-    ):
+async def test_memory_writer_pipeline():
+    """
+    Verify the complete memory write pipeline:
 
-        metadata = metadata or {}
+    Text
+      ↓
+    Text chunking
+      ↓
+    Embedding generation (mocked Bedrock)
+      ↓
+    Memory persistence
+      ↓
+    CockroachDB
 
-        chunks = self.chunker.chunk_text(content)
+    This test uses a mocked Bedrock client to avoid external AWS calls
+    while validating that the memory creation flow works correctly.
+    """
+    
+    chunker = TextChunker()
 
-        saved_memories = []
+    bedrock_client = MockBedrockClient()
 
-        for chunk in chunks:
+    bedrock_service = BedrockEmbeddingService(bedrock_client = bedrock_client)
 
-            embedding = await (
-                self.embedding_service
-                .generate_embedding(chunk)
-            )
+    repository = MockMemoryRepository()
 
-            memory_id = await (
-                self.repository
-                .save_memory(
-                    company_id=company_id,
-                    memory_type=memory_type,
-                    content=chunk,
-                    metadata=metadata,
-                    importance=importance,
-                    embedding=embedding,
-                )
-            )
+    writer = MemoryWriter(
+        chunker = chunker,
+        embedding_service = bedrock_service,
+        repository = repository
+    )
 
-            saved_memories.append(memory_id)
+    company_id = uuid4()
+    test_memory = """
+            A team lead mentioned that she would be away for a personal event this evening
+            and asked everyone to share pull requests or important updates in the group chat.
 
-        return saved_memories
+            The GrowthPilot memory system saved the note successfully. The AI assistant wanted
+            to create a 47-step productivity plan, schedule five reminder notifications, and
+            write an inspirational speech about "the importance of clicking merge," but it
+            finally learned that sometimes the best action is simply remembering and waiting.
+        """
+
+    result = await writer.write(
+        company_id = company_id,
+        text = test_memory
+    )
+
+    assert len(result) > 0
