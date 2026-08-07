@@ -24,7 +24,6 @@ from backend.memory.store import (
     MemoryType,
 )
 
-
 SEARCH_SQL = """
 WITH candidates AS MATERIALIZED
 (
@@ -41,14 +40,6 @@ WITH candidates AS MATERIALIZED
         ) AS similarity
     FROM memories
     WHERE company_id = $1
-      AND (
-          $4::STRING[] IS NULL
-          OR memory_type = ANY($4::STRING[])
-      )
-      AND (
-          $5::TIMESTAMPTZ IS NULL
-          OR created_at >= $5
-      )
     ORDER BY embedding <=> $2::VECTOR(1024)
     LIMIT $3
 )
@@ -62,6 +53,16 @@ SELECT
     similarity,
     created_at
 FROM candidates
+WHERE
+    (
+        $4::STRING[] IS NULL
+        OR memory_type = ANY($4::STRING[])
+    )
+    AND
+    (
+        $5::TIMESTAMPTZ IS NULL
+        OR created_at >= $5
+    )
 ORDER BY
     GREATEST(similarity, 0.0)
     *
@@ -96,7 +97,13 @@ INSERT INTO memories
     embedding
 )
 VALUES (
-    $1, $2, $3, $4, $5, $6, $7::VECTOR(1024)
+    $1,
+    $2,
+    $3,
+    $4,
+    $5,
+    $6,
+    $7::VECTOR(1024)
 )
 ON CONFLICT (company_id, content_hash) DO NOTHING
 RETURNING id
@@ -127,6 +134,7 @@ ORDER BY created_at DESC
 LIMIT $3
 """
 
+
 class MemoryRepository:
     def __init__(
         self,
@@ -154,9 +162,7 @@ class MemoryRepository:
         """
 
         if self.embedding_service is None:
-            raise RuntimeError(
-                "An embedding service is required to write memories"
-            )
+            raise RuntimeError("An embedding service is required to write memories")
 
         content_hash = create_content_hash(content)
 
@@ -320,33 +326,22 @@ class MemoryRepository:
         """
 
         if self.embedding_service is None:
-            raise RuntimeError(
-                "An embedding service is required for memory search"
-            )
+            raise RuntimeError("An embedding service is required for memory search")
 
         if not query.strip():
-            raise ValueError(
-                "Search query must not be empty"
-            )
+            raise ValueError("Search query must not be empty")
 
         if k <= 0:
-            raise ValueError(
-                "Search result count must be positive"
-            )
+            raise ValueError("Search result count must be positive")
 
-        query_embedding = await (
-            self.embedding_service.generate_embedding(query)
-        )
+        query_embedding = await self.embedding_service.generate_embedding(query)
 
         if len(query_embedding) != 1024:
             raise ValueError(
-                "Expected a 1024-dimensional query embedding, "
-                f"received {len(query_embedding)}"
+                f"Expected a 1024-dimensional query embedding, received {len(query_embedding)}"
             )
 
-        query_vector = to_vector_literal(
-            query_embedding
-        )
+        query_vector = to_vector_literal(query_embedding)
 
         # Retrieve more candidates than the caller needs.
         # Hybrid ranking is applied only to this candidate set.
@@ -355,16 +350,7 @@ class MemoryRepository:
             k * 10,
         )
 
-        normalized_types = (
-            [
-                memory_type.value
-                if hasattr(memory_type, "value")
-                else str(memory_type)
-                for memory_type in types
-            ]
-            if types
-            else None
-        )
+        normalized_types = list(types) if types else None
 
         async with database.pool.acquire() as connection:
             rows = await connection.fetch(
@@ -377,10 +363,7 @@ class MemoryRepository:
                 k,
             )
 
-        return [
-            self._to_memory_hit(row)
-            for row in rows
-        ]
+        return [self._to_memory_hit(row) for row in rows]
 
     async def recent(
         self,
@@ -410,10 +393,7 @@ class MemoryRepository:
 
         rows = await run_in_txn(_query)
 
-        return [
-            self._to_memory_hit(row)
-            for row in rows
-        ]
+        return [self._to_memory_hit(row) for row in rows]
 
     @staticmethod
     def _to_memory_hit(
