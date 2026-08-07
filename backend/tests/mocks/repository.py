@@ -39,3 +39,22 @@ class MockMemoryRepository:
         )
 
         return memory_id
+
+    async def save_memories_batch(self, memories):
+        """
+        Mock batch memory persistence.
+        """
+
+        ids = []
+
+        for memory in memories:
+            memory_id = len(self.memories) + 1
+
+            self.memories.append({
+                    "id": memory_id,
+                    **memory
+            })
+
+            ids.append(memory_id)
+
+        return ids

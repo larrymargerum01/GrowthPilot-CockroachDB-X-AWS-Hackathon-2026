@@ -4,11 +4,22 @@ from backend.memory.repository import MemoryRepository
 from backend.database.database import database
 
 
+class MockTransaction:
+
+    async def __aenter__(self):
+        return self
+
+
+    async def __aexit__(self, exc_type, exc, tb):
+        pass
+
 class MockConnection:
 
     async def fetchval(self, query, *args):
         return 1
-
+    
+    def transaction(self):
+        return MockTransaction()
 
 
 class MockAcquire:
@@ -54,6 +65,53 @@ async def test_save_memory():
 
 
     assert result == 1
+
+
+    database.pool = original_pool
+
+@pytest.mark.asyncio
+async def test_save_memories_batch():
+    """
+    T9:
+    Verify batch memory insertion.
+    """
+
+    original_pool = database.pool
+
+    database.pool = MockPool()
+
+
+    repository = MemoryRepository()
+
+
+    memories = [
+        {
+            "company_id": "company-1",
+            "memory_type": "semantic",
+            "content": "First memory",
+            "content_hash": "hash-1",
+            "metadata": {},
+            "importance": 0.5,
+            "embedding": [0.1, 0.2, 0.3],
+        },
+        {
+            "company_id": "company-1",
+            "memory_type": "semantic",
+            "content": "Second memory",
+            "content_hash": "hash-2",
+            "metadata": {},
+            "importance": 0.5,
+            "embedding": [0.4, 0.5, 0.6],
+        },
+    ]
+
+
+    result = await repository.save_memories_batch(
+        memories
+    )
+
+
+    assert len(result) == 2
 
 
     database.pool = original_pool

@@ -21,3 +21,22 @@ class BedrockEmbeddingService:
             self.bedrock_client
             .get_embedding(text)
         )
+
+    async def generate_embeddings(
+        self,
+        texts: list[str],
+    ) -> list[list[float]]:
+        """
+        Generate embeddings for multiple chunks.
+
+        Keeps batching logic here so Bedrock changes
+        stay isolated.
+        """
+
+        embeddings = []
+
+        for text in texts:
+            embedding = await self.generate_embedding(text)
+            embeddings.append(embedding)
+
+        return embeddings

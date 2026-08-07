@@ -7,8 +7,7 @@ operations require custom SQL.
 """
 
 from backend.database.database import database
-
-
+from backend.database.database import run_in_txn
 class MemoryRepository:
 
     async def save_memory(
@@ -39,7 +38,7 @@ class MemoryRepository:
             importance,
             embedding
         )
-        VALUES ($1, $2, $3, $4, $5, $6)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
         RETURNING id;
         """
 
@@ -100,6 +99,64 @@ class MemoryRepository:
         """
 
         async with database.pool.acquire() as connection:
-            memory_id = connection.fetchval(query, company_id, content_hash)
+            memory_id = await connection.fetchval(query, company_id, content_hash)
 
         return memory_id
+
+    async def save_memories_batch(
+        self,
+        memories: list[dict]
+    ):
+        """
+        Insert multiple memories in one transaction.
+
+        CockroachDB transactions may fail with
+        serialization errors, therefore run through
+        retry wrapper.
+        """
+
+        async def transaction(conn):
+
+            ids = []
+
+            query = """
+            INSERT INTO memories
+            (
+                company_id,
+                memory_type,
+                content,
+                content_hash,
+                metadata,
+                importance,
+                embedding
+            )
+            VALUES
+            (
+                $1,
+                $2,
+                $3,
+                $4,
+                $5,
+                $6,
+                $7::VECTOR(1024)
+            )
+            RETURNING id;
+            """
+
+            for memory in memories:
+
+                memory_id = await conn.fetchval(
+                    query,
+                    memory["company_id"],
+                    memory["memory_type"],
+                    memory["content"],
+                    memory["content_hash"],
+                    memory["metadata"],
+                    memory["importance"],
+                    memory["embedding"],
+                )
+
+                ids.append(memory_id)
+
+            return ids
+        return await run_in_txn(transaction)

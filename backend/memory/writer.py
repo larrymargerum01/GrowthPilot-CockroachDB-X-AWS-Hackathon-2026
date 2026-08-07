@@ -37,6 +37,8 @@ class MemoryWriter:
 
         chunks = self.chunker.chunk_text(text)
 
+        pending_chunks = []
+
         saved_memories = []
 
         for chunk in chunks:
@@ -57,24 +59,42 @@ class MemoryWriter:
                 saved_memories.append(existing_memory)
                 continue
 
-            embedding = await (
-                self.embedding_service
-                .generate_embedding(chunk)
-            )
+            pending_chunks.append({
+                "content": chunk,
+                "content_hash": content_hash
+            })
 
-            memory_id = await (
-                self.repository
-                .save_memory(
-                    company_id = company_id,
-                    memory_type = 'semantic',
-                    content = chunk,
-                    content_hash = content_hash,
-                    metadata = {},
-                    importance = 0.5,
-                    embedding = embedding
-                )
-            )
+        if not pending_chunks:
+            return saved_memories
 
-            saved_memories.append(memory_id)
+        texts = [
+            item["content"]
+            for item in pending_chunks
+        ]
+
+        embeddings = await (
+            self.embedding_service
+            .generate_embeddings(texts)
+        )
+
+        memories = []
+
+        for item, embedding in zip(
+            pending_chunks,
+            embeddings
+        ):
+            memories.append({
+                "company_id": company_id,
+                "memory_type": "semantic",
+                "content": item["content"],
+                "content_hash": item["content_hash"],
+                "metadata": {},
+                "importance": 0.5,
+                "embedding": embedding,
+            })
+
+        ids = await self.repository.save_memories_batch(memories)
+
+        saved_memories.extend(ids)
 
         return saved_memories
