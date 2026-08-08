@@ -38,12 +38,16 @@ class MemoryWriter:
         chunks = self.chunker.chunk_text(text)
 
         pending_chunks = []
+        pending_hashes = set()
 
         saved_memories = []
 
         for chunk in chunks:
 
             content_hash = create_content_hash(chunk)
+
+            if content_hash in pending_hashes:
+                continue
 
             # Check if this memory already exists before generating embeddings.
             # This avoids duplicate records and unnecessary Bedrock embedding calls.
@@ -58,6 +62,8 @@ class MemoryWriter:
                 # Reuse existing memory instead of creating a duplicate.
                 saved_memories.append(existing_memory)
                 continue
+
+            pending_hashes.add(content_hash)
 
             pending_chunks.append({
                 "content": chunk,
