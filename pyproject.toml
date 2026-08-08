@@ -6,7 +6,8 @@ dependencies = [
     "fastapi>=0.115",
     "uvicorn[standard]>=0.32",
     "asyncpg>=0.30",
-    "pydantic>=2.9",
+    "email-validator>=2.0.0",
+    "pydantic[email]>=2.9",
     "pydantic-settings>=2.6",
     "boto3>=1.35",
 ]
