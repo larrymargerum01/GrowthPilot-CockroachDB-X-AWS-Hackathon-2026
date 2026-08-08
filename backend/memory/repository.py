@@ -303,7 +303,7 @@ class MemoryRepository:
                     memory["content_hash"],
                     memory["metadata"],
                     memory["importance"],
-                    memory["embedding"],
+                    to_vector_literal(memory["embedding"]),
                 )
 
                 ids.append(memory_id)
