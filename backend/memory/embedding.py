@@ -29,8 +29,7 @@ class BedrockEmbeddingService:
         """
         Generate embeddings for multiple chunks.
 
-        Keeps batching logic here so Bedrock changes
-        stay isolated.
+        Keeps batching logic here so Bedrock changes stay isolated.
         """
 
         embeddings = []
